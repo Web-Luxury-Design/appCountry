@@ -18,13 +18,30 @@ const Blog = () => {
 
   useEffect(() => getData(), []);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (content.length < 140) {
+      setError(true);
+    } else {
+      axios.post("http://localhost:3004/articles", {
+        author,
+        content,
+        date: Date.now(),
+      });
+      setError(false);
+      setAuthor("");
+      setContent("");
+      getData();
+    }
+  };
+
   return (
     <div className="blog-container">
       <Logo />
       <Navigation />
       <h1>Blog</h1>
 
-      <form>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <input
           type="text"
           placeholder="Nom"
@@ -41,9 +58,11 @@ const Blog = () => {
         <input type="submit" value="Envoyer" />
       </form>
       <ul>
-        {blogData.map((article) => (
-          <Article key={article.id} article={article} />
-        ))}
+        {blogData
+          .sort((a, b) => b.date - a.date)
+          .map((article) => (
+            <Article key={article.id} article={article} />
+          ))}
       </ul>
     </div>
   );
